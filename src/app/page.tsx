@@ -86,6 +86,7 @@ export default function Home() {
   const [customerData, setCustomerData] = useState<CustomerData | null>(null)
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
   const [modalProduct, setModalProduct] = useState<{ product: Product; categoryName: string } | null>(null)
+  const [showPromoFlyer, setShowPromoFlyer] = useState(false)
   const categorySliderRef = useRef<HTMLDivElement>(null)
 
   // Admin state
@@ -137,6 +138,20 @@ export default function Home() {
     const savedAdmin = sessionStorage.getItem('nitos-admin')
     if (savedAdmin === 'true') setIsAdmin(true)
   }, [])
+
+  // Mostrar flyer de promo al entrar (una vez por sesión de navegador)
+  useEffect(() => {
+    const seen = sessionStorage.getItem('nitos-promo-flyer-seen')
+    if (!seen) {
+      const timer = setTimeout(() => setShowPromoFlyer(true), 700)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
+  const closePromoFlyer = () => {
+    setShowPromoFlyer(false)
+    sessionStorage.setItem('nitos-promo-flyer-seen', 'true')
+  }
 
   const saveCustomerData = (data: CustomerData) => {
     setCustomerData(data)
@@ -228,6 +243,16 @@ export default function Home() {
       msg += `📝 Nombre: ${customerData.name}\n📞 Tel: ${customerData.phone}\n📍 Dir: ${customerData.address}\n`
       if (customerData.references) msg += `🏠 Ref: ${customerData.references}\n`
     }
+    return buildWhatsAppUrl(msg)
+  }
+
+  function buildPromoWhatsAppUrl(): string {
+    let msg = `👋 Hola, vengo de Nito's Pizza. Me interesa la promo:\n\n`
+    msg += `🎉 *Combo Familiar*\n`
+    msg += `🍕 1 Pizza Familiar\n`
+    msg += `🍕 1 Pizza Mediana\n`
+    msg += `🥤 + Refresco de 2 Litros\n`
+    msg += `\n💲 Total: $300.00 MXN`
     return buildWhatsAppUrl(msg)
   }
 
@@ -508,6 +533,10 @@ export default function Home() {
         <AddressModal onSave={saveCustomerData} onClose={() => setIsAddressModalOpen(false)} initialData={customerData || undefined} />
       )}
 
+      {showPromoFlyer && (
+        <PromoFlyerModal onClose={closePromoFlyer} whatsappUrl={buildPromoWhatsAppUrl()} />
+      )}
+
       <GuidedTour />
     </div>
   )
@@ -754,6 +783,75 @@ export default function Home() {
               <p className="text-[10px] text-center text-gray-500 mt-3 font-medium">* Estos datos solo se usarán para enviar tu pedido por WhatsApp.</p>
             </div>
           </form>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Promo Flyer Modal (al entrar a la página) ──────────────────────────
+
+  function PromoFlyerModal({ onClose, whatsappUrl }: { onClose: () => void; whatsappUrl: string }) {
+    return (
+      <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center" onClick={onClose}>
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+        <div
+          className="relative w-full sm:max-w-sm bg-[#1a1a1a] rounded-t-3xl sm:rounded-3xl overflow-hidden animate-slide-up border border-amber-900/30 shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-black/40 text-white/90 hover:bg-black/60 transition-colors"
+          >
+            ✕
+          </button>
+
+          {/* Header */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-red-600 via-orange-500 to-amber-500 px-6 pt-8 pb-6 text-center">
+            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 10px, rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 20px)' }} />
+            <div className="relative">
+              <span className="inline-block bg-black/30 text-yellow-200 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3">
+                🔥 Oferta Especial
+              </span>
+              <h2 className="text-3xl font-black text-white drop-shadow-md leading-tight">Combo Familiar</h2>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="px-6 py-6 space-y-5">
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3 text-sm font-bold text-gray-100">
+                <span className="text-xl">🍕</span> 1 Pizza Familiar
+              </li>
+              <li className="flex items-center gap-3 text-sm font-bold text-gray-100">
+                <span className="text-xl">🍕</span> 1 Pizza Mediana
+              </li>
+              <li className="flex items-center gap-3 text-sm font-bold text-gray-100">
+                <span className="text-xl">🥤</span> Refresco de 2 Litros
+              </li>
+            </ul>
+
+            <div className="flex items-center justify-center gap-2 py-3 border-y border-amber-900/30">
+              <span className="text-sm text-gray-400 font-semibold">Por solo</span>
+              <span className="text-4xl font-black text-amber-400">$300</span>
+            </div>
+
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 active:scale-[0.98] transition-all text-white font-black py-4 rounded-xl shadow-lg shadow-green-500/20 uppercase tracking-wide text-sm"
+            >
+              Pedir por WhatsApp
+            </a>
+
+            <button
+              onClick={onClose}
+              className="block w-full text-center text-xs text-gray-500 hover:text-gray-300 font-semibold pt-1"
+            >
+              Tal vez después
+            </button>
+          </div>
         </div>
       </div>
     )
