@@ -1385,32 +1385,32 @@ export default function AdminPanelPro({
             </div>
           )}
         </div>
+
+        {/* ─── Dialogs (dentro del wrapper con stopPropagation a propósito) ── */}
+        <ProductFormDialog
+          key={productDialogKey}
+          open={productDialogOpen}
+          onClose={() => {
+            setProductDialogOpen(false)
+            setEditingProduct(undefined)
+          }}
+          categories={categoriesList}
+          initialData={editingProduct}
+          onSave={handleProductSave}
+        />
+
+        <PromotionFormDialog
+          key={promoDialogKey}
+          open={promoDialogOpen}
+          onClose={() => {
+            setPromoDialogOpen(false)
+            setEditingPromotion(undefined)
+          }}
+          allProducts={adminProducts}
+          initialData={editingPromotion}
+          onSave={handlePromotionSave}
+        />
       </div>
-
-      {/* ─── Dialogs ──────────────────────────────────────────────────── */}
-      <ProductFormDialog
-        key={productDialogKey}
-        open={productDialogOpen}
-        onClose={() => {
-          setProductDialogOpen(false)
-          setEditingProduct(undefined)
-        }}
-        categories={categoriesList}
-        initialData={editingProduct}
-        onSave={handleProductSave}
-      />
-
-      <PromotionFormDialog
-        key={promoDialogKey}
-        open={promoDialogOpen}
-        onClose={() => {
-          setPromoDialogOpen(false)
-          setEditingPromotion(undefined)
-        }}
-        allProducts={adminProducts}
-        initialData={editingPromotion}
-        onSave={handlePromotionSave}
-      />
     </div>
   )
 }
