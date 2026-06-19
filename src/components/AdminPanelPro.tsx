@@ -923,7 +923,12 @@ export default function AdminPanelPro({
   return (
     <div
       className="fixed inset-0 z-[200] flex items-start justify-center bg-black/90 backdrop-blur-sm overflow-y-auto"
-      onClick={onClose}
+      onClick={(e) => {
+        // Solo cerrar si el click fue directamente sobre el backdrop, no si "burbujeó"
+        // desde un componente portado (Select/Popover/Command/Dialog de Radix se renderizan
+        // fuera de este árbol DOM y un click ahí puede registrarse como "outside").
+        if (e.target === e.currentTarget) onClose()
+      }}
     >
       <div
         className="relative w-full max-w-4xl mx-4 my-8 bg-[#111] rounded-2xl border border-amber-900/30 shadow-2xl"
