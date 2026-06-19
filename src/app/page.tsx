@@ -387,7 +387,7 @@ export default function Home() {
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(circle, #FFB800 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-3 relative z-10">
             <div className="w-14 h-14 rounded-full border-2 border-amber-500/30 overflow-hidden flex-shrink-0 bg-amber-900/20 flex items-center justify-center">
-              <img src="https://assets.olaclick.app/companies/logos/1fb27f1a-a3e9-4766-9baa-764257321e14.jpg" alt="Nito's Pizza Logo" className="w-full h-full object-cover rounded-full" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }} />
+              <img src="/nitos-logo.png" alt="Nito's Pizza Logo" className="w-full h-full object-cover rounded-full" />
             </div>
             <div className="flex-1 min-w-0">
               <h1 className="text-amber-400 font-extrabold text-xl tracking-tight leading-none">NITO&apos;S PIZZA</h1>

@@ -330,7 +330,11 @@ function ProductFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="bg-[#1a1a1a] border-amber-900/30 max-w-lg max-h-[85vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        className="bg-[#1a1a1a] border-amber-900/30 max-w-lg max-h-[85vh] overflow-y-auto sm:max-w-lg"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-amber-400 text-lg font-extrabold">
             {isEdit ? 'Editar Producto' : 'Añadir Producto'}
@@ -531,7 +535,11 @@ function PromotionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="bg-[#1a1a1a] border-amber-900/30 max-w-lg max-h-[85vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        className="bg-[#1a1a1a] border-amber-900/30 max-w-lg max-h-[85vh] overflow-y-auto sm:max-w-lg"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle className="text-amber-400 text-lg font-extrabold">
             {isEdit ? 'Editar Promoción' : 'Añadir Promoción'}

@@ -23,9 +23,11 @@ const specialPrices = [
   { size: 'Mega', price: 335, sortOrder: 4 },
 ]
 
-const pizzaImg = 'https://assets.olaclick.app/companies/products/images/800/b8af15f5-21c3-46fe-9b03-30cf98c17cae.jpg'
-const burgerImg = 'https://assets.olaclick.app/companies/products/images/800/d6f7da81-946c-4662-9aec-f87b5548e140.jpg'
-const snackImg = 'https://assets.olaclick.app/companies/products/images/800/03930f94-08af-4709-b584-1567db69715f.jpg'
+// Placeholders neutros (genéricos, sin marca de terceros).
+// Reemplázalos producto por producto desde el panel admin (Subir imagen) cuando tengas las fotos reales.
+const pizzaImg = 'https://placehold.co/800x800/2a1a00/FFB800?text=Pizza'
+const burgerImg = 'https://placehold.co/800x800/2a1a00/FFB800?text=Hamburguesa'
+const snackImg = 'https://placehold.co/800x800/2a1a00/FFB800?text=Snack'
 
 async function main() {
   await db.productPrice.deleteMany()
