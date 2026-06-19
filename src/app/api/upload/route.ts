@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server"
-import { writeFile, mkdir } from "fs/promises"
-import path from "path"
+import { put } from "@vercel/blob"
 import { randomUUID } from "crypto"
 
 // Tipos de imagen permitidos y tamaño máximo (5MB)
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"]
 const MAX_SIZE = 5 * 1024 * 1024
 
-// POST /api/upload - Sube una imagen de producto y devuelve su URL pública
+// POST /api/upload - Sube una imagen de producto a Vercel Blob y devuelve su URL pública
 export async function POST(req: Request) {
   try {
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        {
+          error:
+            "El almacenamiento de imágenes (Vercel Blob) no está configurado. Conecta un Blob Store en el proyecto de Vercel.",
+        },
+        { status: 500 }
+      )
+    }
+
     const formData = await req.formData()
     const file = formData.get("file") as File | null
 
@@ -32,16 +41,14 @@ export async function POST(req: Request) {
     }
 
     const ext = (file.type.split("/")[1] || "jpg").replace("jpeg", "jpg")
-    const filename = `${randomUUID()}.${ext}`
+    const filename = `products/${randomUUID()}.${ext}`
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products")
-    await mkdir(uploadDir, { recursive: true })
+    const blob = await put(filename, file, {
+      access: "public",
+      contentType: file.type,
+    })
 
-    const buffer = Buffer.from(await file.arrayBuffer())
-    await writeFile(path.join(uploadDir, filename), buffer)
-
-    const url = `/uploads/products/${filename}`
-    return NextResponse.json({ url })
+    return NextResponse.json({ url: blob.url })
   } catch (error) {
     console.error("Error subiendo imagen:", error)
     return NextResponse.json({ error: "Error al subir la imagen" }, { status: 500 })

@@ -38,7 +38,3 @@ Thumbs.db
 
 # Docker (si genera datos locales o contenedores temporales)
 .docker/
-
-# Imágenes subidas desde el panel admin (contenido, no código)
-public/uploads/products/*
-!public/uploads/products/.gitkeep
