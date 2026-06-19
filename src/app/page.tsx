@@ -99,14 +99,26 @@ export default function Home() {
   useEffect(() => {
     async function fetchMenu() {
       try {
-        const res = await fetch('/api/menu')
-        const data = await res.json()
-        if (data.categories) {
-          setMenuCategories(data.categories)
-          if (data.categories.length > 0 && !activeCategory) {
-            setActiveCategory(data.categories[0].id)
+        const [menuRes, adminRes] = await Promise.all([
+          fetch('/api/menu'),
+          fetch('/api/menu/admin')
+        ])
+        const menuData = await menuRes.json()
+        const adminData = await adminRes.json()
+
+        if (menuData.categories) {
+          setMenuCategories(menuData.categories)
+          if (menuData.categories.length > 0 && !activeCategory) {
+            setActiveCategory(menuData.categories[0].id)
           }
         }
+        if (adminData.extras) setExtrasList(adminData.extras)
+        if (adminData.orillaPrices) {
+          const newMap: Record<string, number> = {}
+          for (const op of adminData.orillaPrices) newMap[op.size] = op.price
+          setOrillaQuesoPrice(newMap)
+        }
+        if (adminData.config?.whatsappNumber) setWhatsappNumber(adminData.config.whatsappNumber)
       } catch (e) {
         console.error('Error fetching menu:', e)
       } finally {
