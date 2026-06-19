@@ -185,6 +185,93 @@ function MultiSelect({
   )
 }
 
+// ─── Image Picker (subida + preview + URL manual) ───────────────────────────
+
+function ImagePicker({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (url: string) => void
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [imgFailed, setImgFailed] = useState(false)
+
+  const handleFileSelect = async (file: File | undefined) => {
+    if (!file) return
+    setError(null)
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Error al subir la imagen')
+        return
+      }
+      setImgFailed(false)
+      onChange(data.url)
+    } catch (e) {
+      console.error('Error uploading image:', e)
+      setError('Error al subir la imagen')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        <div className="w-16 h-16 rounded-lg bg-white/5 border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
+          {value && !imgFailed ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={value}
+              alt="Vista previa"
+              className="w-full h-full object-cover"
+              onError={() => setImgFailed(true)}
+            />
+          ) : (
+            <span className="text-gray-600 text-[10px] text-center px-1">Sin imagen</span>
+          )}
+        </div>
+        <div className="flex-1 space-y-1.5">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="hidden"
+            onChange={(e) => handleFileSelect(e.target.files?.[0])}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={uploading}
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-amber-400 h-8 text-xs"
+          >
+            {uploading ? 'Subiendo...' : 'Subir imagen'}
+          </Button>
+          {error && <p className="text-[10px] text-red-400">{error}</p>}
+        </div>
+      </div>
+      <Input
+        value={value}
+        onChange={(e) => {
+          setImgFailed(false)
+          onChange(e.target.value)
+        }}
+        className="bg-white/5 border-white/10 text-white text-xs focus:border-amber-500/50"
+        placeholder="o pega una URL de imagen: https://..."
+      />
+    </div>
+  )
+}
+
 // ─── Product Form Dialog ─────────────────────────────────────────────────────
 
 function ProductFormDialog({
@@ -316,13 +403,11 @@ function ProductFormDialog({
 
           <div className="space-y-1.5">
             <label className="text-[10px] font-bold text-amber-500/70 uppercase tracking-widest ml-1">
-              Imagen URL
+              Imagen del Producto
             </label>
-            <Input
+            <ImagePicker
               value={form.image}
-              onChange={(e) => setForm((prev) => ({ ...prev, image: e.target.value }))}
-              className="bg-white/5 border-white/10 text-white text-sm focus:border-amber-500/50"
-              placeholder="https://..."
+              onChange={(url) => setForm((prev) => ({ ...prev, image: url }))}
             />
           </div>
 
